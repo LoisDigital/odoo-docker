@@ -10,9 +10,21 @@ ARG DEBIAN_FRONTEND=noninteractive
 # Generate locale C.UTF-8 for postgres and general locale data
 ENV LANG C.UTF-8
 
+# Fix for hash sum mismatch issues - configure apt to be more resilient
+RUN echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/10no-check-valid-until && \
+    echo 'Acquire::Retries 10;' > /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::http::Pipeline-Depth "0";' > /etc/apt/apt.conf.d/99avoid-hashsum-errors && \
+    echo 'Acquire::http::No-Cache=True;' >> /etc/apt/apt.conf.d/99avoid-hashsum-errors && \
+    echo 'Acquire::BrokenProxy=true;' >> /etc/apt/apt.conf.d/99avoid-hashsum-errors
+
+# Clean apt cache and update before installing packages
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get update
+
 # Install dependencies (from Odoo install documentation)
 RUN apt-get update && \
-    apt-get install -y libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev \
+    apt-get install -y --fix-broken --fix-missing libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev \
     libtiff5-dev libjpeg-dev libopenjp2-7-dev zlib1g-dev libfreetype6-dev \
     liblcms2-dev libwebp-dev libharfbuzz-dev libfribidi-dev libxcb1-dev libpq-dev \
     python3-pip
@@ -45,7 +57,6 @@ RUN useradd -ms /bin/bash odoo \
 
 # Install Git (for cloning)
 RUN apt-get install -y git
-
 WORKDIR /opt/odoo
 
 # Install Odoo and dependencies from source and check out specific revision
