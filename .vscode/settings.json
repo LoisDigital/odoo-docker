@@ -10,5 +10,11 @@
     "black-formatter.args": [
         "--line-length",
         "120"
-    ]
+    ],
+    "[xml]": {
+        "editor.defaultFormatter": "thoughtsdump.custom-xml-formatter"
+    },
+    "[dockerfile]": {
+        "editor.defaultFormatter": "ms-azuretools.vscode-containers"
+    }
 }
