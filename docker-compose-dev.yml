@@ -18,6 +18,7 @@ services:
       - ODOO_ENV=dev
     volumes:
       - "../custom_addons/:/opt/odoo/custom_addons/loistalagrand"
+      - "../odoo_docker/:/opt/odoo/odoo_docker"
       - "../.git:/opt/odoo/.git"
       - "./.vscode:/opt/odoo/.vscode"
       - "./odoo.conf:/etc/odoo/odoo.conf"
