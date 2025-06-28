@@ -73,10 +73,6 @@ USER root
 RUN pip3 install pip --upgrade
 RUN pip3 install --no-cache-dir -r odoo/requirements.txt
 
-# Define runtime configuration
-COPY src/odoo.conf /etc/odoo
-RUN chown odoo:odoo /etc/odoo/odoo.conf
-
 USER odoo
 
 RUN mkdir /opt/odoo/data /opt/odoo/custom_addons \
