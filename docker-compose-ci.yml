@@ -13,14 +13,15 @@ services:
       - USER=odoo
       - PASSWORD=myodoo
     volumes:
-      - "./addons:/mnt/extra-addons"
-      - "./files:/opt/odoo/files"
+      - "../custom_addons/:/opt/odoo/custom_addons/loistalagrand"
+      - "./odoo.conf:/etc/odoo/odoo.conf"
     command: >
-      /usr/bin/odoo 
-      --stop-after-init 
+      /opt/odoo/odoo/odoo-bin 
+      --config=/etc/odoo/odoo.conf
+      --stop-after-init
       --database testing_db 
-      --db_user=odoo 
-      --db_host=db 
+      --db_user=odoo
+      --db_host=db
       --db_password=myodoo
       --init customize
       --test-tags /panda_lingua 
