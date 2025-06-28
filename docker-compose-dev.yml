@@ -17,8 +17,7 @@ services:
       - PASSWORD=myodoo
       - ODOO_ENV=dev
     volumes:
-      - "../fenuasoftware:/opt/odoo/custom_addons/fenuasoftware"
-      - "../enterprise:/opt/odoo/custom_addons/enterprise"
+      - "../loistalagrand:/opt/odoo/custom_addons/loistalagrand"
       - "./.vscode:/opt/odoo/.vscode"
       - "./src/odoo.conf:/etc/odoo/odoo.conf"
     tty: true

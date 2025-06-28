@@ -11,8 +11,8 @@
             "program": "${workspaceRoot}/odoo/odoo-bin",
             "args": [
                 "--database=development",
-                "--init=customize",
-                // "--dev=xml,qweb",
+                // "--init=customize",
+                "--dev=xml,qweb",
                 "--config=/etc/odoo/odoo.conf",
             ],
             "console": "integratedTerminal"
@@ -27,7 +27,7 @@
                 "--database=development",
                 "--dev=xml,qweb",
                 "--config=/etc/odoo/odoo.conf",
-                "--test-tags=.test_01_pos_inlane_tour",
+                "--test-tags=/panda_lingua",
                 // "--screencasts=/tmp",
             ],
             "console": "integratedTerminal"
@@ -42,7 +42,7 @@
                 "--database=development",
                 "--dev=xml,qweb",
                 "--config=/etc/odoo/odoo.conf",
-                "--update=pos_numpad_ext",
+                "--update=panda_lingua",
             ],
             "console": "integratedTerminal"
         },
@@ -56,7 +56,7 @@
                 "--database=development",
                 "--dev=xml,qweb",
                 "--config=/etc/odoo/odoo.conf",
-                "--init=pos_numpad_ext",
+                "--init=panda_lingua",
             ],
             "console": "integratedTerminal"
         },
