@@ -82,4 +82,4 @@ ENV ODOO_RC /etc/odoo/odoo.conf
 ENV PATH="/opt/odoo/scripts:${PATH}"
 
 EXPOSE 8069
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+CMD ["tail", "-f", "/dev/null"]
