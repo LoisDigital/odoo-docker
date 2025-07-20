@@ -4,7 +4,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run Odoo",
+            "name": "🚀 Run Odoo",
             "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceRoot}",
@@ -18,7 +18,7 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Run tests",
+            "name": "🧪 Run tests",
             "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceRoot}",
@@ -27,13 +27,13 @@
                 "--database=development",
                 "--dev=xml,qweb",
                 "--config=/etc/odoo/odoo.conf",
-                "--test-tags=/panda_lingua",
+                "--test-tags=${input:testTags}",
                 // "--screencasts=/tmp",
             ],
             "console": "integratedTerminal"
         },
         {
-            "name": "Update module",
+            "name": "🔄 Update module",
             "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceRoot}",
@@ -42,12 +42,12 @@
                 "--database=development",
                 "--dev=xml,qweb",
                 "--config=/etc/odoo/odoo.conf",
-                "--update=panda_lingua",
+                "--update=${input:module}",
             ],
             "console": "integratedTerminal"
         },
         {
-            "name": "Install module",
+            "name": "📦 Install module",
             "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceRoot}",
@@ -56,12 +56,12 @@
                 "--database=development",
                 "--dev=xml,qweb",
                 "--config=/etc/odoo/odoo.conf",
-                "--init=panda_lingua",
+                "--init=${input:module}",
             ],
             "console": "integratedTerminal"
         },
         {
-            "name": "Init DB",
+            "name": "🗄️ Init DB",
             "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceRoot}",
@@ -70,23 +70,55 @@
                 "--dev=xml,qweb",
                 "--config=/etc/odoo/odoo.conf",
                 //"--load-language=fr_FR",
-                "--init=development",
+                "--init=${input:initModule}",
                 "--database=development",
             ],
             "console": "integratedTerminal"
         },
         {
-            "name": "Scaffold",
+            "name": "🏗️ Scaffold",
             "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceRoot}",
             "program": "${workspaceRoot}/odoo/odoo-bin",
             "args": [
                 "scaffold",
-                "acd_website",
-                "/opt/odoo/custom_addons/loistalagrand"
+                "${input:scaffoldModule}",
+                "${input:scaffoldPath}"
             ],
             "console": "integratedTerminal"
         },
+    ],
+    "inputs": [
+        {
+            "id": "module",
+            "description": "Module name",
+            "default": "panda_lingua",
+            "type": "promptString"
+        },
+        {
+            "id": "testTags",
+            "description": "Test tags (e.g., /module_name, TestClass.test_method, /module1,/module2)",
+            "default": "/panda_lingua",
+            "type": "promptString"
+        },
+        {
+            "id": "initModule",
+            "description": "Module to initialize with database",
+            "default": "customize",
+            "type": "promptString"
+        },
+        {
+            "id": "scaffoldModule",
+            "description": "New module name to scaffold",
+            "default": "module_name",
+            "type": "promptString"
+        },
+        {
+            "id": "scaffoldPath",
+            "description": "Path where to create the scaffolded module",
+            "default": "/opt/odoo/custom_addons/loistalagrand",
+            "type": "promptString"
+        }
     ]
 }
