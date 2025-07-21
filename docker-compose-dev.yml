@@ -4,8 +4,8 @@ services:
     user: root
     platform: linux/amd64
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: odoo_docker/Dockerfile
     depends_on:
       database-17.0:
         condition: service_healthy
