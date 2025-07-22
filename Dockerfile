@@ -73,13 +73,9 @@ USER root
 RUN pip3 install pip --upgrade
 RUN pip3 install --no-cache-dir -r odoo/requirements.txt
 
-# Install custom addon requirements if they exist
-COPY custom_addons /opt/odoo/custom_addons
-RUN find /opt/odoo/custom_addons -name "requirements.txt" -exec pip3 install --no-cache-dir -r {} \;
-
 USER odoo
 
-RUN mkdir /opt/odoo/data \
+RUN mkdir /opt/odoo/data /opt/odoo/custom_addons \
     /opt/odoo/.vscode /home/odoo/.vscode-server
 
 ENV ODOO_RC /etc/odoo/odoo.conf
