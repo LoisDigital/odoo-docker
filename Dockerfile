@@ -73,6 +73,19 @@ USER root
 RUN pip3 install pip --upgrade
 RUN pip3 install --no-cache-dir -r odoo/requirements.txt
 
+# Copy custom addons directory to find requirements files
+COPY --chown=odoo:odoo ../custom_addons /tmp/custom_addons
+
+# Install requirements from all custom modules that have both __manifest__.py and requirements.txt
+RUN find /tmp/custom_addons -name "__manifest__.py" -exec dirname {} \; | \
+    while read module_dir; do \
+        if [ -f "$module_dir/requirements.txt" ]; then \
+            echo "Installing requirements for module: $module_dir"; \
+            pip3 install --no-cache-dir -r "$module_dir/requirements.txt"; \
+        fi; \
+    done && \
+    rm -rf /tmp/custom_addons
+
 USER odoo
 
 RUN mkdir /opt/odoo/data /opt/odoo/custom_addons \
