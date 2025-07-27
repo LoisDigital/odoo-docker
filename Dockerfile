@@ -77,43 +77,39 @@ RUN pip3 install --no-cache-dir -r odoo/requirements.txt
 USER odoo
 
 # Create the custom requirements installation script
-RUN cat > /opt/odoo/scripts/install_custom_requirements.sh << 'EOF'
-#!/bin/bash
-
-# Script to install requirements from custom Odoo modules
-# This script finds all custom modules (identified by __manifest__.py)
-# and installs their requirements.txt if present
-
-echo "Checking for custom module requirements..."
-
-# Find all directories with __manifest__.py files in custom_addons
-find /opt/odoo/custom_addons -name "__manifest__.py" -exec dirname {} \; | while read module_dir; do
-    if [ -f "$module_dir/requirements.txt" ]; then
-        echo "Installing requirements for module: $module_dir"
-        sudo pip3 install --no-cache-dir -r "$module_dir/requirements.txt"
-        if [ $? -eq 0 ]; then
-            echo "Successfully installed requirements for $module_dir"
-        else
-            echo "Failed to install requirements for $module_dir"
-        fi
-    fi
-done
-
-echo "Custom requirements installation complete."
-EOF
+RUN echo '#!/bin/bash' > /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '# Script to install requirements from custom Odoo modules' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '# This script finds all custom modules (identified by __manifest__.py)' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '# and installs their requirements.txt if present' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo 'echo "Checking for custom module requirements..."' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '# Find all directories with __manifest__.py files in custom_addons' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo 'find /opt/odoo/custom_addons -name "__manifest__.py" -exec dirname {} \; | while read module_dir; do' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '    if [ -f "$module_dir/requirements.txt" ]; then' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '        echo "Installing requirements for module: $module_dir"' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '        sudo pip3 install --no-cache-dir -r "$module_dir/requirements.txt"' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '        if [ $? -eq 0 ]; then' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '            echo "Successfully installed requirements for $module_dir"' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '        else' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '            echo "Failed to install requirements for $module_dir"' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '        fi' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '    fi' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo 'done' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo '' >> /opt/odoo/scripts/install_custom_requirements.sh && \
+    echo 'echo "Custom requirements installation complete."' >> /opt/odoo/scripts/install_custom_requirements.sh
 
 RUN chmod +x /opt/odoo/scripts/install_custom_requirements.sh
 
 # Create an entrypoint script that installs requirements and then runs the command
-RUN cat > /opt/odoo/scripts/entrypoint.sh << 'EOF'
-#!/bin/bash
-
-# Install custom requirements first
-/opt/odoo/scripts/install_custom_requirements.sh
-
-# Execute the command passed to the container
-exec "$@"
-EOF
+RUN echo '#!/bin/bash' > /opt/odoo/scripts/entrypoint.sh && \
+    echo '' >> /opt/odoo/scripts/entrypoint.sh && \
+    echo '# Install custom requirements first' >> /opt/odoo/scripts/entrypoint.sh && \
+    echo '/opt/odoo/scripts/install_custom_requirements.sh' >> /opt/odoo/scripts/entrypoint.sh && \
+    echo '' >> /opt/odoo/scripts/entrypoint.sh && \
+    echo '# Execute the command passed to the container' >> /opt/odoo/scripts/entrypoint.sh && \
+    echo 'exec "$@"' >> /opt/odoo/scripts/entrypoint.sh
 
 RUN chmod +x /opt/odoo/scripts/entrypoint.sh
 
