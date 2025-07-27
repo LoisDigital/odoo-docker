@@ -32,7 +32,7 @@ RUN apt-get update && \
 # Install additional tools needed for build & run
 # For some reason, python3.11 is needed, but Odoo will actually run with Python 3.10.
 RUN apt-get update && apt-get install -y python3.11 \ 
-    gcc g++ curl git nano postgresql-client
+    gcc g++ curl git nano postgresql-client sudo
 
 # install wkhtmltox for PDF reports
 RUN curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb \
@@ -53,7 +53,8 @@ RUN apt-get install -y nodejs
 # Create odoo user and directories and set permissions
 RUN useradd -ms /bin/bash odoo \
     && mkdir /etc/odoo /opt/odoo /opt/odoo/scripts \
-    && chown -R odoo:odoo /etc/odoo /opt/odoo
+    && chown -R odoo:odoo /etc/odoo /opt/odoo \
+    && echo "odoo ALL=(ALL) NOPASSWD: /usr/bin/pip3" >> /etc/sudoers
 
 # Install Git (for cloning)
 RUN apt-get install -y git
@@ -73,20 +74,48 @@ USER root
 RUN pip3 install pip --upgrade
 RUN pip3 install --no-cache-dir -r odoo/requirements.txt
 
-# Copy custom addons directory to find requirements files
-COPY --chown=odoo:odoo ../custom_addons /tmp/custom_addons
-
-# Install requirements from all custom modules that have both __manifest__.py and requirements.txt
-RUN find /tmp/custom_addons -name "__manifest__.py" -exec dirname {} \; | \
-    while read module_dir; do \
-        if [ -f "$module_dir/requirements.txt" ]; then \
-            echo "Installing requirements for module: $module_dir"; \
-            pip3 install --no-cache-dir -r "$module_dir/requirements.txt"; \
-        fi; \
-    done && \
-    rm -rf /tmp/custom_addons
-
 USER odoo
+
+# Create the custom requirements installation script
+RUN cat > /opt/odoo/scripts/install_custom_requirements.sh << 'EOF'
+#!/bin/bash
+
+# Script to install requirements from custom Odoo modules
+# This script finds all custom modules (identified by __manifest__.py)
+# and installs their requirements.txt if present
+
+echo "Checking for custom module requirements..."
+
+# Find all directories with __manifest__.py files in custom_addons
+find /opt/odoo/custom_addons -name "__manifest__.py" -exec dirname {} \; | while read module_dir; do
+    if [ -f "$module_dir/requirements.txt" ]; then
+        echo "Installing requirements for module: $module_dir"
+        sudo pip3 install --no-cache-dir -r "$module_dir/requirements.txt"
+        if [ $? -eq 0 ]; then
+            echo "Successfully installed requirements for $module_dir"
+        else
+            echo "Failed to install requirements for $module_dir"
+        fi
+    fi
+done
+
+echo "Custom requirements installation complete."
+EOF
+
+RUN chmod +x /opt/odoo/scripts/install_custom_requirements.sh
+
+# Create an entrypoint script that installs requirements and then runs the command
+RUN cat > /opt/odoo/scripts/entrypoint.sh << 'EOF'
+#!/bin/bash
+
+# Install custom requirements first
+/opt/odoo/scripts/install_custom_requirements.sh
+
+# Execute the command passed to the container
+exec "$@"
+EOF
+
+RUN chmod +x /opt/odoo/scripts/entrypoint.sh
 
 RUN mkdir /opt/odoo/data /opt/odoo/custom_addons \
     /opt/odoo/.vscode /home/odoo/.vscode-server
@@ -95,4 +124,5 @@ ENV ODOO_RC /etc/odoo/odoo.conf
 ENV PATH="/opt/odoo/scripts:${PATH}"
 
 EXPOSE 8069
+ENTRYPOINT ["/opt/odoo/scripts/entrypoint.sh"]
 CMD ["tail", "-f", "/dev/null"]
