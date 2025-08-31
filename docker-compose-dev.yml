@@ -17,7 +17,7 @@ services:
       - PASSWORD=myodoo
       - ODOO_ENV=dev
     volumes:
-      - "../custom_addons/:/opt/odoo/custom_addons/loistalagrand"
+      - "../:/opt/odoo/custom_addons/loistalagrand"
       - "../odoo_docker/:/opt/odoo/odoo_docker"
       - "./.vscode:/opt/odoo/.vscode"
       - "./odoo.conf:/etc/odoo/odoo.conf"
