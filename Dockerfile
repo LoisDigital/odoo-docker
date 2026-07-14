@@ -44,11 +44,16 @@ RUN curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/packaging/releases
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt-get install -y nodejs
 
+# Forest Panda repairs generated audio with pydub, which requires ffmpeg.
+# Keep this late in the image so adding or updating it does not invalidate the
+# expensive Odoo source and Python-dependency layers above.
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
 # Needed for JS tour tests
 # RUN pip install websocket-client
 # RUN apt-get update
 # RUN apt-get install chromium -y
-# RUN apt install ffmpeg -y
 
 # Create odoo user and directories and set permissions
 RUN useradd -ms /bin/bash odoo \
